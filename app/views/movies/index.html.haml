@@ -3,9 +3,11 @@
 %table#movies
   %thead
     %tr
-      %th#title_header{class: (if @clicked_column == "title" then "hilite" end)}= link_to "Movie Title", movies_path(:sort => "by_title")
+      %th#title_header{class: (if @clicked_column == "title" then "hilite" end)}
+        = link_to "Movie Title", movies_path(:sort => "by_title")
       %th Rating
-      %th#release_date_header{class: (if @clicked_column == "release_date" then "hilite" end)}= link_to "Release Data", movies_path(:sort => "by_release_date")
+      %th#release_date_header{class: (if @clicked_column == "release_date" then "hilite" end)}
+        = link_to "Release Data", movies_path(:sort => "by_release_date")
       %th More Info
   %tbody
     - @movies.each do |movie|
