@@ -10,7 +10,12 @@ class MoviesController < ApplicationController
   end
 
   def index
+    # extract rating options
     @all_ratings = Movie.all_ratings
+    if params[:rating] != nil
+      @selected_ratings = params[:ratings].keys
+    end
+
     sort_option = params[:sort]
     if sort_option == 'by_title'
       @movies = Movie.order(:title)
