@@ -13,30 +13,31 @@ class MoviesController < ApplicationController
     # extract params
     @all_ratings = Movie.all_ratings
     sort_option = params[:sort]
-    rating_options = params[:ratings]
+    @rating_options = params[:ratings]
 
     # store choices to season[]
     if sort_option.nil?
-      sort_option = season[:sort]
+      sort_option = session[:sort]
     else
-      season[:sort] = sort_option
+      session[:sort] = sort_option
     end
 
-    if rating_options.nil?
-      rating_options = season[:ratings]
+    if @rating_options.nil?
+      @rating_options = session[:ratings]
     else
-      season[:rating_options] = rating_options
+      session[:rating_options] = @rating_options
     end
+
 
     # query base on params
-    @movies = if sort_option.nil? && rating_options.nil?
+    @movies = if sort_option.nil? && @rating_options.nil?
                 Movie.all
-              elsif sort_option && rating_options.nil?
+              elsif sort_option && @rating_options.nil?
                 Movie.order(sort_option)
-              elsif rating_options && sort_option.nil?
-                Movie.where(rating: rating_options.keys)
+              elsif @rating_options && sort_option.nil?
+                Movie.where(rating: @rating_options.keys)
               else
-                Movie.where(rating: rating_options.keys).order(sort_option)
+                Movie.where(rating: @rating_options.keys).order(sort_option)
               end
 
     # update column header
