@@ -10,22 +10,24 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # extract rating options
+    # extract params
     @all_ratings = Movie.all_ratings
-    if params[:rating] != nil
-      @selected_ratings = params[:ratings].keys
-    end
-
     sort_option = params[:sort]
-    if sort_option == 'by_title'
-      @movies = Movie.order(:title)
-      @clicked_column = "title"
-    elsif sort_option == 'by_release_date'
-      @movies = Movie.order(:release_date)
-      @clicked_column = "release_date"
-    else
-      @movies = Movie.all
-    end
+    rating_options = params[:ratings]
+
+    # query base on params
+    @movies = if sort_option.nil? && rating_options.nil?
+                Movie.all
+              elsif sort_option && rating_options.nil?
+                Movie.order(sort_option)
+              elsif rating_options && sort_option.nil?
+                Movie.where(rating: rating_options.keys)
+              else
+                Movie.where(rating: rating_options.keys).order(sort_option)
+              end
+
+    # update column header
+    @clicked_column = sort_option unless sort_option.nil?
   end
 
   def new
