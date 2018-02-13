@@ -15,6 +15,19 @@ class MoviesController < ApplicationController
     sort_option = params[:sort]
     rating_options = params[:ratings]
 
+    # store choices to season[]
+    if sort_option.nil?
+      sort_option = season[:sort]
+    else
+      season[:sort] = sort_option
+    end
+
+    if rating_options.nil?
+      rating_options = season[:ratings]
+    else
+      season[:rating_options] = rating_options
+    end
+
     # query base on params
     @movies = if sort_option.nil? && rating_options.nil?
                 Movie.all
