@@ -15,6 +15,9 @@ class MoviesController < ApplicationController
     sort_option = params[:sort]
     @rating_options = params[:ratings]
 
+    puts "#{@all_ratings}\n"
+    puts "#{@rating_options}\n"
+
     # store choices to season[]
     if sort_option.nil?
       sort_option = session[:sort]
@@ -23,11 +26,14 @@ class MoviesController < ApplicationController
     end
 
     if @rating_options.nil?
-      @rating_options = session[:ratings]
+      puts "HERE \n"
+
+      @rating_options = session[:rating_options]
     else
       session[:rating_options] = @rating_options
     end
 
+    puts "After #{@rating_options}\n"
 
     # query base on params
     @movies = if sort_option.nil? && @rating_options.nil?
