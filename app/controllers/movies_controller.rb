@@ -15,46 +15,38 @@ class MoviesController < ApplicationController
     @sort_option = params[:sort]
     @rating_options = params[:ratings]
 
-    # no params and no history
-    if @sort_option.nil? && @rating_options.nil?
-      if session[:sort].nil? && session[:ratings].nil?
-        @movies = Movie.all
+    # fill the missing param from session if available
+    if @sort_option.nil?
+      @sort_option = session[:sort]
+      if @sort_option
+        flash.keep
+        redirect_to movies_path(sort: @sort_option, ratings: @rating_options)
         return
       end
     end
 
-    # extract information from session if no params were given
-    if @sort_option.nil? && session[:sort]
-      @sort_option = session[:sort]
-      flash.keep
-      redirect_to movies_path(sort: @sort_option, ratings: @rating_options)
-      return
-    else
+    if @rating_options.nil?
+      @rating_options = session[:ratings]
+      if @rating_options
+        flash.keep
+        redirect_to movies_path(sort: @sort_option, ratings: @rating_options)
+        return
+      end
+    end
+
+    if @sort_option.nil? && @rating_options.nil?
+      @movies = Movie.all
+    elsif @sort_option && @rating_options.nil?
+      @movies = Movie.order(@sort_option)
       session[:sort] = @sort_option
-    end
-
-    if @rating_options.nil? && session[:ratings]
-      @rating_options = session[:rating_options]
-      flash.keep
-      redirect_to movies_path(sort: @sort_option, ratings: @rating_options)
-      return
+    elsif @rating_options && @sort_option.nil?
+      @movies = Movie.where(rating: @rating_options.keys)
+      session[:ratings] = @rating_options
     else
-      session[:rating_options] = @rating_options
+      @movies = Movie.where(rating: @rating_options.keys).order(@sort_option)
+      session[:sort] = @sort_option
+      session[:ratings] = @rating_options
     end
-
-    @movies = if @sort_option.nil? && @rating_options.nil?
-                Movie.all
-              elsif @sort_option && @rating_options.nil?
-                Movie.order(@sort_option)
-              elsif @rating_options && @sort_option.nil?
-                Movie.where(rating: @rating_options.keys)
-              else
-                Movie.where(rating: @rating_options.keys).order(@sort_option)
-              end
-
-    # update column header
-    @clicked_column = @sort_option unless @sort_option.nil?
-    reset_session
 
   end
 
