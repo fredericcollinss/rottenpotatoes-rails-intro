@@ -1,3 +1,4 @@
+require 'socket'
 class MoviesController < ApplicationController
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
@@ -15,27 +16,25 @@ class MoviesController < ApplicationController
     sort_option = params[:sort]
     @rating_options = params[:ratings]
 
-    puts "#{@all_ratings}\n"
-    puts "#{@rating_options}\n"
-
     # store choices to season[]
     if sort_option.nil?
       sort_option = session[:sort]
+      flash.keep
+      redirect_to movies_path(sort: sort_option, ratings: params[:ratings])
+      return
     else
       session[:sort] = sort_option
     end
 
     if @rating_options.nil?
-      puts "HERE \n"
-
       @rating_options = session[:rating_options]
+      redirect_to movies_path(sort: sort_option, ratings: @rating_options)
+      flash.keep
+      return
     else
       session[:rating_options] = @rating_options
     end
 
-    puts "After #{@rating_options}\n"
-
-    # query base on params
     @movies = if sort_option.nil? && @rating_options.nil?
                 Movie.all
               elsif sort_option && @rating_options.nil?
@@ -48,6 +47,8 @@ class MoviesController < ApplicationController
 
     # update column header
     @clicked_column = sort_option unless sort_option.nil?
+
+
   end
 
   def new
